@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -90,6 +91,16 @@ public class SlimeSlap extends JavaPlugin{
 		
 	}
 	
+	public static World GetWorldByName(String name){
+		ArrayList<World> worlds = (ArrayList<World>) Bukkit.getServer().getWorlds();
+		for (int i = 0; i < worlds.size(); i++){
+			if (worlds.get(i).getName().equals(name)){
+				return worlds.get(i);
+			}
+		}
+		return null;
+	}
+	
 	private void InitializeSlimeSlapper(){
 		ItemMeta meta = SlimeSlapper.getItemMeta();
 		meta.setDisplayName(ChatColor.AQUA + "Slime Slapper");
@@ -156,6 +167,7 @@ public class SlimeSlap extends JavaPlugin{
 		PluginManager pm = getServer().getPluginManager();
 		setupPermissions();
 		DOUBLE_DECIMAL.setMinimumFractionDigits(2);
+		getLogger().info("Loaded SlimeSlap successfully!");
 		}
 	/////////////*END OnEnable*/////////////
 	@Override
@@ -254,6 +266,23 @@ public class SlimeSlap extends JavaPlugin{
 						if (perms.has(player, AdminPerm.getName())){
 						player.sendMessage(String.format("%s, %s, %s", config.getString("Arena.x"), config.getString("Arena.y"), config.getString("Arena.z")));
 							}
+						} else if (args[0].equalsIgnoreCase("SetSpawn")){
+								if (perms.has(player, AdminPerm.getName())){
+								String x = DOUBLE_DECIMAL.format(player.getLocation().getX()), y = DOUBLE_DECIMAL.format(player.getLocation().getY()), z = DOUBLE_DECIMAL.format(player.getLocation().getZ());
+								getConfig().set("Spawn.x", x);
+								getConfig().set("Spawn.y", y);
+								getConfig().set("Spawn.z", z);
+								
+								player.sendMessage(String.format("Set the Slime Slap spawn to X:%s, Y:%s, Z:%x", x, y, z));
+								
+								saveConfig();
+								reloadConfig();
+								} else player.sendMessage(NoPerm);
+						} else if (args[0].equalsIgnoreCase("SetWorld")){
+							String name = player.getWorld().getName();
+							getConfig().set("World", name);
+							saveConfig();
+							reloadConfig();
 						}
 							
 					else{
