@@ -14,6 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -62,9 +63,19 @@ public class PlayerListener implements Listener{
 						killer.getInventory().addItem(e.getDrops().get(i));
 					}
 					e.getDrops().clear();
-
+					
 				}
 			}
+		}
+	}
+	
+	@EventHandler
+	public void OnPlayerRespawn(PlayerRespawnEvent e){
+		Player player = e.getPlayer();
+		SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player);
+		if (ss != null && ss.getInSlimeSlap()){
+			Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.x")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.y")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.z")));
+			player.teleport(loc);
 		}
 	}
 	
