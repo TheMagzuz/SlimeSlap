@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -273,8 +274,12 @@ public class SlimeSlap extends JavaPlugin{
 								getConfig().set("Spawn.y", y);
 								getConfig().set("Spawn.z", z);
 								
-								player.sendMessage(String.format("Set the Slime Slap spawn to X:%s, Y:%s, Z:%x", x, y, z));
+					
 								
+								
+								
+								player.sendMessage(String.format(ChatColor.GREEN + "Set Slime Slap spawn to be at X:%s, Y:%s, Z:%s", x, y, z));
+							
 								saveConfig();
 								reloadConfig();
 								} else player.sendMessage(NoPerm);

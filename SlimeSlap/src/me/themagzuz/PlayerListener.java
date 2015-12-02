@@ -2,6 +2,8 @@ package me.themagzuz;
 
 import java.math.BigDecimal;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -39,7 +42,7 @@ public class PlayerListener implements Listener{
 		}
 	}
 	
-	@EventHandler
+	/*@EventHandler
 	public void OnPlayerDeath(PlayerDeathEvent e){
 		Player killed = (Player) e.getEntity();
 		Player killer;
@@ -63,21 +66,91 @@ public class PlayerListener implements Listener{
 						killer.getInventory().addItem(e.getDrops().get(i));
 					}
 					e.getDrops().clear();
-					
+					Double x, y, z;
+					try{
+					x =(Double)SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x"));
+					y =(Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y"));
+					z = (Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z"));
+					} catch(ParseException er){
+						killed.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
+						return;
+					}
+					Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), x, y, z);
+					killed.setHealth(20.0);
+					killed.teleport(loc);
 				}
 			}
 		}
-	}
+	}*/
 	
 	@EventHandler
+	public void OnEntityDamage(EntityDamageByEntityEvent e){
+		SlimeSlap.pl.getLogger().info("Something took damage!");
+		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player){
+			Player damaged = (Player) e.getEntity();
+			Player damager = (Player) e.getDamager();
+			
+			if (damaged.getHealth() - e.getDamage() < 1){
+				
+				if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
+					SlimeSlapPlayer killed = SlimeSlapPlayer.getSlimeSlapPlayer(damaged);
+					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
+					if(killed.getInSlimeSlap() && killer.getInSlimeSlap()){
+						
+						List<ItemStack> drops = new ArrayList<ItemStack>();
+						
+						drops.clear();
+						
+						drops.add(SlimeSlap.killTicket);
+						
+						for (int i = 0; i < SlimeSlap.getTickets(damaged); i++){
+							drops.add(SlimeSlap.killTicket);
+						}
+						for (int i = 0; i < drops.size(); i++){
+							damager.getInventory().addItem(drops.get(i));
+						}
+						
+						Double x, y, z;
+						try{
+							x =(Double)SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
+							y =(Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue();
+							z = (Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
+						} catch(ParseException er){
+							damaged.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
+							return;
+						}
+						Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), x, y, z);
+						damaged.teleport(loc);
+						damaged.setHealth(20.0);
+						damaged.sendMessage("§cYou died! You lost all of your tickets!");
+						damaged.getInventory().clear();
+						e.setCancelled(true);
+					}
+				}
+			}
+			
+		}
+	}
+	
+	/*@EventHandler
 	public void OnPlayerRespawn(PlayerRespawnEvent e){
 		Player player = e.getPlayer();
 		SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player);
 		if (ss != null && ss.getInSlimeSlap()){
-			Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.x")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.y")), Double.parseDouble(SlimeSlap.pl.getConfig().getString("Spawn.z")));
+			Double x, y, z;
+			try{
+			x =(Double)SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x"));
+			y =(Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y"));
+			z = (Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z"));
+			} catch(ParseException er){
+				player.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
+				return;
+			}
+			Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), x, y, z);
+			e.setRespawnLocation(loc);
 			player.teleport(loc);
 		}
-	}
+	}*/
 	
 	@EventHandler
 	public void OnBlockRightClick(PlayerInteractEvent e){
@@ -85,7 +158,7 @@ public class PlayerListener implements Listener{
 			Player player = (Player) e.getPlayer();
 			if (e.getClickedBlock().getState() instanceof Sign){
 				
-
+				
 				
 				Sign sign = (Sign) e.getClickedBlock().getState();
 				
