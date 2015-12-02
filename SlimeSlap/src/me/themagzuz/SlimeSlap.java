@@ -266,7 +266,7 @@ public class SlimeSlap extends JavaPlugin{
 						if (perms.has(player, AdminPerm.getName())){
 						player.sendMessage(String.format("%s, %s, %s", config.getString("Arena.x"), config.getString("Arena.y"), config.getString("Arena.z")));
 							}
-						} else if (args[0].equalsIgnoreCase("SetSpawn")){
+						} else if (args[0].equalsIgnoreCase("setspawn")){
 								if (perms.has(player, AdminPerm.getName())){
 								String x = DOUBLE_DECIMAL.format(player.getLocation().getX()), y = DOUBLE_DECIMAL.format(player.getLocation().getY()), z = DOUBLE_DECIMAL.format(player.getLocation().getZ());
 								getConfig().set("Spawn.x", x);
@@ -278,7 +278,7 @@ public class SlimeSlap extends JavaPlugin{
 								saveConfig();
 								reloadConfig();
 								} else player.sendMessage(NoPerm);
-						} else if (args[0].equalsIgnoreCase("SetWorld")){
+						} else if (args[0].equalsIgnoreCase("setworld")){
 							String name = player.getWorld().getName();
 							getConfig().set("World", name);
 							saveConfig();
