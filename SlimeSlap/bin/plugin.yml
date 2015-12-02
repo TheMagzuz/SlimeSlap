@@ -1,0 +1,13 @@
+name: SlimeSlap
+main: me.themagzuz.SlimeSlap
+version: 1.0
+commands:
+   slimeslap:
+      description: Main command for Slime Slap
+      usage: /<command> [Sub Command]
+   reloadconfig:
+      description: Reloads the Slime Slap Config
+      usage: /<command>
+   ss:
+      description: Main command for Slime Slap
+      usage: /<command> [Sub Command]
