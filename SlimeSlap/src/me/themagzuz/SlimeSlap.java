@@ -33,7 +33,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.earth2me.essentials.Essentials;
 
 import net.milkbowl.vault.Vault;
 import net.milkbowl.vault.chat.Chat;
@@ -271,7 +270,7 @@ public class SlimeSlap extends JavaPlugin{
 								if (perms.has(player, AdminPerm.getName())){
 								String x = DOUBLE_DECIMAL.format(player.getLocation().getX()), y = DOUBLE_DECIMAL.format(player.getLocation().getY()), z = DOUBLE_DECIMAL.format(player.getLocation().getZ());
 								getConfig().set("Spawn.x", x);
-								getConfig().set("Spawn.y", y);
+								getConfig().set("Spawn.y", y+1);
 								getConfig().set("Spawn.z", z);
 								
 					
