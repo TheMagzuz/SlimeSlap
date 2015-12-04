@@ -8,6 +8,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -206,12 +207,34 @@ public class PlayerListener implements Listener{
 						player.sendMessage(ChatColor.GREEN + "Joined Slime Slap!");
 						player.getInventory().addItem(SlimeSlap.SlimeSlapper);
 					} else if (sign.getLine(1).equalsIgnoreCase(ChatColor.GREEN + "Leave")){
-						player.teleport(player.getBedSpawnLocation());
-						player.getInventory().remove(SlimeSlap.SlimeSlapper);
-						SlimeSlapPlayer.getSlimeSlapPlayer(player).setInSlimeSlap(false);
+						if (SlimeSlapPlayer.getSlimeSlapPlayer(player).getInSlimeSlap()){
+							double x, y, z;
+							World world;
+							try {
+								x = (double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
+								y= (double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue(); 
+								z= (double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
+								world = SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World"));
+							} catch(ParseException er){
+								player.sendMessage("§cSome of the coordinates to the arena are not numbers! Contact the server admin immidiately!");
+								return;
+							}
+						
+							Location loc;
+						
+							if (world != null){
+								loc = new Location(world, x, y, z);
+							} else {
+								player.sendMessage(String.format("§cThe world \'%s\' does not exist", SlimeSlap.pl.getConfig().getString("World")));
+								return;
+							}
+						
+							player.teleport(loc);
+							player.getInventory().remove(SlimeSlap.SlimeSlapper);
+							SlimeSlapPlayer.getSlimeSlapPlayer(player).setInSlimeSlap(false);
+						} else player.sendMessage("§cYou are not in Slime Slap!");
 					}
 				}
-				
 			}
 		}
 	}
