@@ -1,6 +1,6 @@
 name: SlimeSlap
 main: me.themagzuz.SlimeSlap
-version: 1.0
+version: 1.0.1
 commands:
    slimeslap:
       description: Main command for Slime Slap
