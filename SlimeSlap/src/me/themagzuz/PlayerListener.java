@@ -172,19 +172,14 @@ public class PlayerListener implements Listener{
 					reward = Integer.parseInt(sign.getLine(1).substring(4, sign.getLine(1).length()));
 					toGive+=tickets*reward;
 
-					if ((double) SlimeSlap.getTickets(player)/10 >= 1){
-						if (SlimeSlap.pl.getConfig().getBoolean("BonusConstant")){
-							bonus += (SlimeSlap.bonus*Math.floor((double) tickets/10));
-
-						}
 					SlimeSlap.removeTickets(player);
-					player.sendMessage("Version Check Successful!");
+					
 					if (bonus != 0){
 						toGive += bonus;
 					}
-					}
+					
 					if (toGive > 0){
-
+					
 				    player.sendMessage(String.format(ChatColor.GREEN + "Traded in %s tickets for $%s", String.valueOf(tickets), SlimeSlap.DOUBLE_DECIMAL.format(toGive)));
 					} else player.sendMessage("§cYou don't have any tickets!");
 				    if (bonus != 0 && toGive > 0){

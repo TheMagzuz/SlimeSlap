@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -158,6 +159,7 @@ public class SlimeSlap extends JavaPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
+        getLogger().info("Version Check");
         InitializeSlimeSlapper();
 		LoadConfig();
 		new PlayerListener(this);
@@ -291,6 +293,11 @@ public class SlimeSlap extends JavaPlugin{
 							getConfig().set("World", name);
 							saveConfig();
 							reloadConfig();
+						} else if (args[0].equalsIgnoreCase("setbonus")){
+							if (perms.has(player, AdminPerm.getName())){
+							player.sendMessage("§4Invalid usage");
+							player.sendMessage("§4Proper usage is: §c/ss setbonus <bonus>");
+							} else player.sendMessage(NoPerm);
 						}
 							
 					else{
@@ -330,6 +337,20 @@ public class SlimeSlap extends JavaPlugin{
 							player.sendMessage(String.format("§cPlayer \'%s\' not found!", args[1]));
 						}
 						} else player.sendMessage(NoPerm);
+					} else if (args[0].equalsIgnoreCase("setbonus")){
+						if (perms.has(player, AdminPerm.getName())){
+							double set;
+							try{
+								set = Double.parseDouble(args[1]);
+							} catch (Exception e){
+								player.sendMessage(String.format("§c\'%s\' is not a valid number", args[1]));
+								return true;
+							}
+							getConfig().set("Bonus", set);
+							saveConfig();
+							reloadConfig();
+							player.sendMessage(String.format("§aThe bonus is now §b%s", set));
+						}
 					}
 				} else if (args.length == 3){
 					if (args[0].equalsIgnoreCase("set") && Bukkit.getPlayer(args[1]) != null){
