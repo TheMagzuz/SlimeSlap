@@ -178,6 +178,7 @@ public class PlayerListener implements Listener{
 
 						}
 					SlimeSlap.removeTickets(player);
+					player.sendMessage("Version Check Successful!");
 					if (bonus != 0){
 						toGive += bonus;
 					}

@@ -196,11 +196,15 @@ public class SlimeSlap extends JavaPlugin{
 	
 	int i = 0;
 	
+	
+	
     for (ItemStack item : items)
     {
         if ((item != null) && (item.getItemMeta().equals(killTicket.getItemMeta())) && (item.getAmount() > 0))
         {
-        	inv.setItem(i, EMPTYITEM);
+        
+        	player.getInventory().setItem(i, EMPTYITEM);
+        	
         }
         i++;
     }
