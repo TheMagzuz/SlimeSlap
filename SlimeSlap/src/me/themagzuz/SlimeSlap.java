@@ -26,6 +26,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -102,6 +104,67 @@ public class SlimeSlap extends JavaPlugin{
 		return null;
 	}
 	
+	public static void HandlePlayerDeath(Player killed, SlimeSlapPlayer ssKilled, Player killer, SlimeSlapPlayer ssKiller, EntityDamageEvent e){
+		List<ItemStack> drops = new ArrayList<ItemStack>();
+		drops.clear();
+		
+		drops.add(killTicket);
+		
+		for (int i = 0; i < getTickets(killed); i++){
+			drops.add(killTicket);
+			killer.sendMessage(String.valueOf(i));
+		}
+		for (int i = 0; i < drops.size(); i++){
+			killer.getInventory().addItem(drops.get(i));
+		}
+		
+		Double x, y, z;
+		try{
+			x =(Double)DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
+			y =(Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue();
+			z = (Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
+		} catch(ParseException er){
+			killed.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
+			return;
+		}
+		Location loc = new Location(GetWorldByName(pl.getConfig().getString("World")), x, y, z);
+		killed.teleport(loc);
+		killed.setHealth(20.0);
+		killed.sendMessage("§cYou died! You lost all of your tickets!");
+		killed.getInventory().clear();
+		e.setCancelled(true);
+	}
+	public static void HandlePlayerDeath(Player killed, SlimeSlapPlayer ssKilled, Player killer, SlimeSlapPlayer ssKiller, EntityDamageByEntityEvent e){
+		List<ItemStack> drops = new ArrayList<ItemStack>();
+		drops.clear();
+		
+		drops.add(killTicket);
+		
+		for (int i = 0; i < getTickets(killed); i++){
+			drops.add(killTicket);
+			killer.sendMessage(String.valueOf(i));
+		}
+		for (int i = 0; i < drops.size(); i++){
+			killer.getInventory().addItem(drops.get(i));
+		}
+		
+		Double x, y, z;
+		try{
+			x =(Double)DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
+			y =(Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue();
+			z = (Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
+		} catch(ParseException er){
+			killed.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
+			return;
+		}
+		Location loc = new Location(GetWorldByName(pl.getConfig().getString("World")), x, y, z);
+		killed.teleport(loc);
+		killed.setHealth(20.0);
+		killed.sendMessage("§cYou died! You lost all of your tickets!");
+		killed.getInventory().clear();
+		e.setCancelled(true);
+	}
+	
 	private void InitializeSlimeSlapper(){
 		ItemMeta meta = SlimeSlapper.getItemMeta();
 		meta.setDisplayName(ChatColor.AQUA + "Slime Slapper");
@@ -111,11 +174,18 @@ public class SlimeSlap extends JavaPlugin{
 	}
 	
 	public static boolean HasSlimeSlapPlayer(Player player){
+		
+
+		
 		for (int i = 0; i < players.size(); i++){
 			
 			if(players.get(i).getPlayer().equals(player)){
 				return true;
 			}
+		}
+		if (pl.getConfig().contains(player.getUniqueId().toString())){
+			
+			return true;
 		}
 		return false;
 	}
@@ -324,7 +394,7 @@ public class SlimeSlap extends JavaPlugin{
 						} else player.sendMessage(NoPerm);
 					} else if (args[0].equalsIgnoreCase("get")){
 						if (Bukkit.getPlayer(args[1]) != null){
-							player.sendMessage(ChatColor.GREEN + "The Slime Slap state of " + Bukkit.getPlayer(args[1]) + " is " + SlimeSlapPlayer.getSlimeSlapPlayer(Bukkit.getPlayer(args[1])).getInSlimeSlap());
+							player.sendMessage(ChatColor.GREEN + "The Slime Slap state of " + Bukkit.getPlayer(args[1]).getName() + " is " + SlimeSlapPlayer.getSlimeSlapPlayer(Bukkit.getPlayer(args[1])).getInSlimeSlap());
 						} else{
 							player.sendMessage(ChatColor.RED + "Player not found");
 						}

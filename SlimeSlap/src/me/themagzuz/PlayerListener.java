@@ -15,6 +15,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -86,45 +87,26 @@ public class PlayerListener implements Listener{
 	
 	@EventHandler
 	public void OnEntityDamage(EntityDamageByEntityEvent e){
-		SlimeSlap.pl.getLogger().info("Something took damage!");
 		if (e.getEntity() instanceof Player && e.getDamager() instanceof Player){
 			Player damaged = (Player) e.getEntity();
 			Player damager = (Player) e.getDamager();
 			
+			if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
+				SlimeSlapPlayer ssKiller = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
+				SlimeSlapPlayer ssKilled = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
+				ssKilled.SetLastDamage(damager);
+				
+			}
+				
 			if (damaged.getHealth() - e.getDamage() < 1){
 				
 				if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
 					SlimeSlapPlayer killed = SlimeSlapPlayer.getSlimeSlapPlayer(damaged);
 					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
 					if(killed.getInSlimeSlap() && killer.getInSlimeSlap()){
+						killed.SetLastDamage(damager);
+						SlimeSlap.HandlePlayerDeath(damaged, killed, damager, killer, e);
 						
-						List<ItemStack> drops = new ArrayList<ItemStack>();
-						
-						drops.clear();
-						
-						drops.add(SlimeSlap.killTicket);
-						
-						for (int i = 0; i < SlimeSlap.getTickets(damaged); i++){
-							drops.add(SlimeSlap.killTicket);
-						}
-						for (int i = 0; i < drops.size(); i++){
-							damager.getInventory().addItem(drops.get(i));
-						}
-						
-						Double x, y, z;
-						try{
-							x =(Double)SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
-							y =(Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue();
-							z = (Double) SlimeSlap.DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
-						} catch(ParseException er){
-							damaged.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
-							return;
-						}
-						Location loc = new Location(SlimeSlap.GetWorldByName(SlimeSlap.pl.getConfig().getString("World")), x, y, z);
-						damaged.teleport(loc);
-						damaged.setHealth(20.0);
-						damaged.sendMessage("§cYou died! You lost all of your tickets!");
-						damaged.getInventory().clear();
 						e.setCancelled(true);
 					}
 				}
@@ -132,6 +114,26 @@ public class PlayerListener implements Listener{
 			
 		}
 	}
+	
+	@EventHandler
+	public void OnEntityDamage(EntityDamageEvent e){
+		if (e.getEntity() instanceof Player){
+			
+			Player player = (Player) e.getEntity();
+			SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player);
+					if (ss.GetLastDamage() != null){
+						
+						if (player.getHealth() - e.getDamage() < 1){
+							player.sendMessage("The error is probably in the player death handler");
+							SlimeSlap.HandlePlayerDeath(player, ss, ss.GetLastDamage(), SlimeSlapPlayer.getSlimeSlapPlayer(ss.GetLastDamage()), e);
+						}
+					} else return;
+				}
+				
+			}
+			
+		
+	
 	
 	/*@EventHandler
 	public void OnPlayerRespawn(PlayerRespawnEvent e){
