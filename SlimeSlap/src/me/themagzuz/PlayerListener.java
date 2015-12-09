@@ -39,7 +39,7 @@ public class PlayerListener implements Listener{
 		
 		if (!SlimeSlap.HasSlimeSlapPlayer(player)){
 			SlimeSlap.pl.getLogger().info(player.getName() + " does not have a SlimeSlapPlayer instance. Creating one");
-			SlimeSlap.players.add(new SlimeSlapPlayer(player));
+			SlimeSlap.players.add(new SlimeSlapPlayer(e.getPlayer().getUniqueId()));
 			SlimeSlap.pl.getLogger().info("Created a SlimeSlapPlayer instance for " + player.getName());
 		}
 	}

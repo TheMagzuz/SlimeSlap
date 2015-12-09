@@ -58,11 +58,32 @@ public class SlimeSlapPlayer {
 				id = thePlayer;
 				inSlimeSlap = inSS;
 				this.damager = damager;
+				FileConfiguration cfg = SlimeSlap.pl.getConfig();
+				String path = ("Players."+thePlayer.toString());
+				cfg.set(path+".inSlimeSlap", inSS);
+				cfg.set(path+".lastDamage", damager.toString());
 			} else {
 				logger.severe(String.format("Tried to create a Slime Slap Player for a player that already has one! [%s]", p.getName()));
 				
 			}
 		}
+	
+	}
+	
+	public SlimeSlapPlayer (UUID thePlayer){
+		Logger logger = SlimeSlap.pl.getLogger();
+		if (Bukkit.getPlayer(thePlayer) != null){
+			Player p = Bukkit.getPlayer(thePlayer);
+			if (!SlimeSlap.HasSlimeSlapPlayer(p)){
+				id = thePlayer;
+				inSlimeSlap = false;
+				damager = null;
+				FileConfiguration cfg = SlimeSlap.pl.getConfig();
+				String path = ("Players."+thePlayer.toString());
+				cfg.set(path+".inSlimeSlap", false);
+				cfg.set(path+".lastDamage", "");
+			} else logger.severe(String.format("Tried to crate a Slime Slap Player instace for a player that already has one! [%s]", p.getName()));
+		} else logger.severe(String.format("Tried to create a Slime Slap Player instace for a player that does not exist [UUID: %s]", thePlayer.toString()));
 	}
 	
 	@Deprecated
@@ -129,6 +150,12 @@ public class SlimeSlapPlayer {
 		Logger logger = SlimeSlap.pl.getLogger();
 		boolean inSlimeSlap = cfg.getBoolean(path+".inSlimeSlap");
 		UUID damage = UUID.fromString(cfg.getString(path+".lastDamage"));
+		
+		if (!(cfg.contains(path))){
+			logger.severe("Tried to load a Slime Slap instance that is not saved!");
+			return;
+		}
+		
 		if (Bukkit.getPlayer(player) != null){
 			if (!SlimeSlap.HasSlimeSlapPlayer(Bukkit.getPlayer(player))){
 				Return = new SlimeSlapPlayer(player, inSlimeSlap, damage);
