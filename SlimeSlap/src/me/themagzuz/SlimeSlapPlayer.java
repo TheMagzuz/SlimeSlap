@@ -62,6 +62,8 @@ public class SlimeSlapPlayer {
 				String path = ("Players."+thePlayer.toString());
 				cfg.set(path+".inSlimeSlap", inSS);
 				cfg.set(path+".lastDamage", damager.toString());
+				SlimeSlap.pl.saveConfig();
+				SlimeSlap.pl.reloadConfig();
 			} else {
 				logger.severe(String.format("Tried to create a Slime Slap Player for a player that already has one! [%s]", p.getName()));
 				
@@ -82,8 +84,11 @@ public class SlimeSlapPlayer {
 				String path = ("Players."+thePlayer.toString());
 				cfg.set(path+".inSlimeSlap", false);
 				cfg.set(path+".lastDamage", "");
+				SlimeSlap.pl.saveConfig();
+				SlimeSlap.pl.reloadConfig();
 			} else logger.severe(String.format("Tried to crate a Slime Slap Player instace for a player that already has one! [%s]", p.getName()));
 		} else logger.severe(String.format("Tried to create a Slime Slap Player instace for a player that does not exist [UUID: %s]", thePlayer.toString()));
+		
 	}
 	
 	@Deprecated
@@ -184,5 +189,18 @@ public class SlimeSlapPlayer {
 				
 			
 		}
+		
+
 	}
+	
+	public UUID getUUID(){
+		return id;
+	}
+	
+	public static boolean hasSavedPlayer(UUID p){
+		if (SlimeSlap.pl.getConfig().contains("Players."+p.toString())){
+			return true;
+		} else return false;
+	}
+	
 }

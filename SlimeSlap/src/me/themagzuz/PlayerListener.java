@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -36,7 +37,6 @@ public class PlayerListener implements Listener{
 		Player player = (Player) e.getPlayer();
 		
 		SlimeSlap.perms.playerAdd(player, "SlimeSlap.Signs.Create.Sell");
-		
 		if (!SlimeSlap.HasSlimeSlapPlayer(player)){
 			SlimeSlap.pl.getLogger().info(player.getName() + " does not have a SlimeSlapPlayer instance. Creating one");
 			SlimeSlap.players.add(new SlimeSlapPlayer(e.getPlayer().getUniqueId()));
@@ -91,9 +91,12 @@ public class PlayerListener implements Listener{
 			Player damaged = (Player) e.getEntity();
 			Player damager = (Player) e.getDamager();
 			
+			UUID damagedID = damager.getUniqueId();
+			UUID damagerID = damaged.getUniqueId();
+			
 			if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
-				SlimeSlapPlayer ssKiller = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
-				SlimeSlapPlayer ssKilled = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
+				SlimeSlapPlayer ssKiller = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
+				SlimeSlapPlayer ssKilled = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
 				ssKilled.SetLastDamage(damager);
 				
 			}
@@ -101,8 +104,8 @@ public class PlayerListener implements Listener{
 			if (damaged.getHealth() - e.getDamage() < 1){
 				
 				if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
-					SlimeSlapPlayer killed = SlimeSlapPlayer.getSlimeSlapPlayer(damaged);
-					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damager);
+					SlimeSlapPlayer killed = SlimeSlapPlayer.getSlimeSlapPlayer(damagedID);
+					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
 					if(killed.getInSlimeSlap() && killer.getInSlimeSlap()){
 						killed.SetLastDamage(damager);
 						SlimeSlap.HandlePlayerDeath(damaged, killed, damager, killer, e);
@@ -120,7 +123,7 @@ public class PlayerListener implements Listener{
 		if (e.getEntity() instanceof Player){
 			
 			Player player = (Player) e.getEntity();
-			SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player);
+			SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId());
 					if (ss.GetLastDamage() != null){
 						
 						if (player.getHealth() - e.getDamage() < 1){
@@ -201,11 +204,11 @@ public class PlayerListener implements Listener{
 						}
 						Location loc = new Location(player.getWorld(), x, y, z);
 						player.teleport(loc);
-						SlimeSlapPlayer.getSlimeSlapPlayer(player).setInSlimeSlap(true);
+						SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId()).setInSlimeSlap(true);
 						player.sendMessage(ChatColor.GREEN + "Joined Slime Slap!");
 						player.getInventory().addItem(SlimeSlap.SlimeSlapper);
 					} else if (sign.getLine(1).equalsIgnoreCase(ChatColor.GREEN + "Leave")){
-						if (SlimeSlapPlayer.getSlimeSlapPlayer(player).getInSlimeSlap()){
+						if (SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId()).getInSlimeSlap()){
 							double x, y, z;
 							World world;
 							try {
@@ -229,7 +232,7 @@ public class PlayerListener implements Listener{
 						
 							player.teleport(loc);
 							player.getInventory().remove(SlimeSlap.SlimeSlapper);
-							SlimeSlapPlayer.getSlimeSlapPlayer(player).setInSlimeSlap(false);
+							SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId()).setInSlimeSlap(false);
 						} else player.sendMessage("§cYou are not in Slime Slap!");
 					}
 				}

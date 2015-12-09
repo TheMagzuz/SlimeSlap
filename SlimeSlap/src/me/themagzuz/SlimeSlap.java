@@ -165,6 +165,22 @@ public class SlimeSlap extends JavaPlugin{
 		e.setCancelled(true);
 	}
 	
+	private void LoadSlimeSlapPlayers(){
+		for (SlimeSlapPlayer p : players){
+			SlimeSlapPlayer.LoadSlimeSlapPlayer(p.getUUID());
+		}
+		for (Player p : Bukkit.getOnlinePlayers()){
+			if (HasSlimeSlapPlayer(p)) continue;
+			else if (SlimeSlapPlayer.hasSavedPlayer(p.getUniqueId())){ 
+				SlimeSlapPlayer.LoadSlimeSlapPlayer(p.getUniqueId());
+				log.info(String.format("", args));
+			} else{ 
+				new SlimeSlapPlayer(p.getUniqueId());
+				log.info(String.format("%s does not have a Slime Slap Player instance, a new one has been created", p.getName()));
+			}
+		}
+	}
+	
 	private void InitializeSlimeSlapper(){
 		ItemMeta meta = SlimeSlapper.getItemMeta();
 		meta.setDisplayName(ChatColor.AQUA + "Slime Slapper");
@@ -229,7 +245,6 @@ public class SlimeSlap extends JavaPlugin{
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-        getLogger().info("Version Check");
         InitializeSlimeSlapper();
 		LoadConfig();
 		new PlayerListener(this);
@@ -239,6 +254,7 @@ public class SlimeSlap extends JavaPlugin{
 		PluginManager pm = getServer().getPluginManager();
 		setupPermissions();
 		DOUBLE_DECIMAL.setMinimumFractionDigits(2);
+		LoadSlimeSlapPlayers();
 		getLogger().info("Loaded SlimeSlap successfully!");
 		}
 	/////////////*END OnEnable*/////////////
