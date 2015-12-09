@@ -97,7 +97,9 @@ public class PlayerListener implements Listener{
 			if (SlimeSlap.HasSlimeSlapPlayer(damaged) && SlimeSlap.HasSlimeSlapPlayer(damager)){
 				SlimeSlapPlayer ssKiller = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
 				SlimeSlapPlayer ssKilled = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
-				ssKilled.SetLastDamage(damager);
+				if (ssKiller.getInSlimeSlap() && ssKilled.getInSlimeSlap()){
+					ssKilled.SetLastDamage(damager.getUniqueId());
+				}
 				
 			}
 				
@@ -107,8 +109,8 @@ public class PlayerListener implements Listener{
 					SlimeSlapPlayer killed = SlimeSlapPlayer.getSlimeSlapPlayer(damagedID);
 					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
 					if(killed.getInSlimeSlap() && killer.getInSlimeSlap()){
-						killed.SetLastDamage(damager);
-						SlimeSlap.HandlePlayerDeath(damaged, killed, damager, killer, e);
+						killed.SetLastDamage(damager.getUniqueId());
+						SlimeSlap.HandlePlayerDeath(damaged, killed, damager, killer);
 						
 						e.setCancelled(true);
 					}
@@ -124,11 +126,12 @@ public class PlayerListener implements Listener{
 			
 			Player player = (Player) e.getEntity();
 			SlimeSlapPlayer ss = SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId());
+			player.sendMessage(SlimeSlap.DOUBLE_DECIMAL.format(player.getHealth() - e.getDamage()));
 					if (ss.GetLastDamage() != null){
 						
 						if (player.getHealth() - e.getDamage() < 1){
 							player.sendMessage("The error is probably in the player death handler");
-							SlimeSlap.HandlePlayerDeath(player, ss, ss.GetLastDamage(), SlimeSlapPlayer.getSlimeSlapPlayer(ss.GetLastDamage()), e);
+							SlimeSlap.HandlePlayerDeath(player.getUniqueId(), ss, ss.getLastDamager(), SlimeSlapPlayer.getSlimeSlapPlayer(ss.getLastDamager()));
 						}
 					} else return;
 				}

@@ -104,9 +104,12 @@ public class SlimeSlap extends JavaPlugin{
 		return null;
 	}
 	
-	public static void HandlePlayerDeath(Player killed, SlimeSlapPlayer ssKilled, Player killer, SlimeSlapPlayer ssKiller, EntityDamageEvent e){
+	public static void HandlePlayerDeath(UUID died, SlimeSlapPlayer ssKilled, UUID theKiller, SlimeSlapPlayer ssKiller){
 		List<ItemStack> drops = new ArrayList<ItemStack>();
 		drops.clear();
+		
+		Player killer = Bukkit.getPlayer(theKiller);
+		Player killed = Bukkit.getPlayer(died);
 		
 		drops.add(killTicket);
 		
@@ -132,38 +135,8 @@ public class SlimeSlap extends JavaPlugin{
 		killed.setHealth(20.0);
 		killed.sendMessage("§cYou died! You lost all of your tickets!");
 		killed.getInventory().clear();
-		e.setCancelled(true);
 	}
-	public static void HandlePlayerDeath(Player killed, SlimeSlapPlayer ssKilled, Player killer, SlimeSlapPlayer ssKiller, EntityDamageByEntityEvent e){
-		List<ItemStack> drops = new ArrayList<ItemStack>();
-		drops.clear();
-		
-		drops.add(killTicket);
-		
-		for (int i = 0; i < getTickets(killed); i++){
-			drops.add(killTicket);
-			killer.sendMessage(String.valueOf(i));
-		}
-		for (int i = 0; i < drops.size(); i++){
-			killer.getInventory().addItem(drops.get(i));
-		}
-		
-		Double x, y, z;
-		try{
-			x =(Double)DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.x")).doubleValue();
-			y =(Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.y")).doubleValue();
-			z = (Double) DOUBLE_DECIMAL.parse(SlimeSlap.pl.getConfig().getString("Spawn.z")).doubleValue();
-		} catch(ParseException er){
-			killed.sendMessage("§cSome of the coordinates to the spawn are not numbers! Contact the server admin immidiatly!");
-			return;
-		}
-		Location loc = new Location(GetWorldByName(pl.getConfig().getString("World")), x, y, z);
-		killed.teleport(loc);
-		killed.setHealth(20.0);
-		killed.sendMessage("§cYou died! You lost all of your tickets!");
-		killed.getInventory().clear();
-		e.setCancelled(true);
-	}
+
 	
 	private void LoadSlimeSlapPlayers(){
 		for (SlimeSlapPlayer p : players){
@@ -173,7 +146,7 @@ public class SlimeSlap extends JavaPlugin{
 			if (HasSlimeSlapPlayer(p)) continue;
 			else if (SlimeSlapPlayer.hasSavedPlayer(p.getUniqueId())){ 
 				SlimeSlapPlayer.LoadSlimeSlapPlayer(p.getUniqueId());
-				log.info(String.format("", args));
+				log.info(String.format("%s has a saved Slime Slap Player that will be loaded", p.getName()));
 			} else{ 
 				new SlimeSlapPlayer(p.getUniqueId());
 				log.info(String.format("%s does not have a Slime Slap Player instance, a new one has been created", p.getName()));
@@ -310,8 +283,10 @@ public class SlimeSlap extends JavaPlugin{
         }
         econ = rsp.getProvider();
         return econ != null;
+        
     }
 	
+    
 	
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
@@ -334,7 +309,7 @@ public class SlimeSlap extends JavaPlugin{
 						player.performCommand("help slimeslap");
 						//TODO: Add an actual help subcommand
 					} else if(args[0].equalsIgnoreCase("get")){
-						player.sendMessage(ChatColor.GREEN + "Your Slime Slap state is: " + SlimeSlapPlayer.getSlimeSlapPlayer(player).getInSlimeSlap());
+						player.sendMessage(ChatColor.GREEN + "Your Slime Slap state is: " + SlimeSlapPlayer.getSlimeSlapPlayer(player.getUniqueId()).getInSlimeSlap());
 					} else if (args[0].equalsIgnoreCase("set")){
 						if (perms.has(sender, AdminPerm.getName()))
 							player.sendMessage(ChatColor.RED + "Usage: /slimeslap set <player> [true:false]");
@@ -395,10 +370,10 @@ public class SlimeSlap extends JavaPlugin{
 						if(Bukkit.getPlayer(args[1]) != null){
 							Player target = Bukkit.getPlayer(args[1]);
 							SlimeSlapPlayer targetSlimeSlap;
-							targetSlimeSlap = SlimeSlapPlayer.getSlimeSlapPlayer(target);
+							targetSlimeSlap = SlimeSlapPlayer.getSlimeSlapPlayer(target.getUniqueId());
 							targetSlimeSlap.setInSlimeSlap(!targetSlimeSlap.getInSlimeSlap());
 							player.sendMessage("Toggled the Slime Slap state of " + target.getDisplayName() + " to " + targetSlimeSlap.getInSlimeSlap());
-						}
+						} else player.sendMessage(String.format("§c\'%s\' is not a valid player", args[1]));
 						} else player.sendMessage(NoPerm);
 					} else if(args[0].equalsIgnoreCase("add")){
 						if (perms.has(sender, AdminPerm.getName())){
@@ -443,11 +418,15 @@ public class SlimeSlap extends JavaPlugin{
 						if (perms.has(sender, AdminPerm.getName())){
 						if (args[2].equalsIgnoreCase("true") || args[2].equalsIgnoreCase("false")){
 						boolean set = Boolean.parseBoolean(args[2]);
+						
+						if (Bukkit.getPlayer(args[1]) != null){
 						Player target = Bukkit.getPlayer(args[1]);
-						SlimeSlapPlayer targetSlimeSlap = SlimeSlapPlayer.getSlimeSlapPlayer(target);
-						if(targetSlimeSlap != null)
+						SlimeSlapPlayer targetSlimeSlap = SlimeSlapPlayer.getSlimeSlapPlayer(target.getUniqueId());
+						if(targetSlimeSlap != null){
 						targetSlimeSlap.setInSlimeSlap(set);
 						player.sendMessage("Set the Slime Slap state of " + target.getDisplayName() + " to " + args[2]);
+						}
+						} else player.sendMessage(String.format("§c\'%s\' is not a valid player", args[1]));
 						} else {
 							player.sendMessage(ChatColor.RED + "\'" + args[2] + "\' is not a valid value!");
 						}

@@ -61,7 +61,9 @@ public class SlimeSlapPlayer {
 				FileConfiguration cfg = SlimeSlap.pl.getConfig();
 				String path = ("Players."+thePlayer.toString());
 				cfg.set(path+".inSlimeSlap", inSS);
-				cfg.set(path+".lastDamage", damager.toString());
+				if (damager != null){
+					cfg.set(path+".lastDamage", damager.toString());
+				} else cfg.set(path+".lastDamage", null);
 				SlimeSlap.pl.saveConfig();
 				SlimeSlap.pl.reloadConfig();
 			} else {
@@ -118,7 +120,7 @@ public class SlimeSlapPlayer {
 	
 	public static SlimeSlapPlayer getSlimeSlapPlayer(UUID toGet){
 		for (int i = 0; i < SlimeSlap.players.size(); i++){
-			if (SlimeSlap.players.get(i).getPlayer().getUniqueId().equals(toGet)) return SlimeSlap.players.get(i);
+			if (SlimeSlap.players.get(i).getUUID().equals(toGet)) return SlimeSlap.players.get(i);
 			else continue;
 		}
 		if (SlimeSlap.pl.getConfig().contains("Players."+toGet)){
@@ -154,8 +156,12 @@ public class SlimeSlapPlayer {
 		FileConfiguration cfg = SlimeSlap.pl.getConfig();
 		Logger logger = SlimeSlap.pl.getLogger();
 		boolean inSlimeSlap = cfg.getBoolean(path+".inSlimeSlap");
-		UUID damage = UUID.fromString(cfg.getString(path+".lastDamage"));
-		
+		UUID damage;
+		try {
+			damage = UUID.fromString(cfg.getString(path+".lastDamage"));
+		} catch (Exception e){
+			damage = null;
+		}
 		if (!(cfg.contains(path))){
 			logger.severe("Tried to load a Slime Slap instance that is not saved!");
 			return;
@@ -181,7 +187,9 @@ public class SlimeSlapPlayer {
 			}
 			
 		}
-		LoadSlimeSlapPlayer (id);
+		
+		
+		
 		if (Bukkit.getPlayer(id) != null){
 			if(!SlimeSlap.HasSlimeSlapPlayer(Bukkit.getPlayer(id))){
 				SlimeSlap.players.add(new SlimeSlapPlayer(id, false, null));
@@ -201,6 +209,14 @@ public class SlimeSlapPlayer {
 		if (SlimeSlap.pl.getConfig().contains("Players."+p.toString())){
 			return true;
 		} else return false;
+	}
+	
+	public UUID getLastDamager(){
+		return damager;
+	}
+	
+	public void SetLastDamage(UUID id){
+		damager = id;
 	}
 	
 }
