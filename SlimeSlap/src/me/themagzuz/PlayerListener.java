@@ -110,7 +110,7 @@ public class PlayerListener implements Listener{
 					SlimeSlapPlayer killer = SlimeSlapPlayer.getSlimeSlapPlayer(damagerID);
 					if(killed.getInSlimeSlap() && killer.getInSlimeSlap()){
 						killed.SetLastDamage(damager.getUniqueId());
-						SlimeSlap.HandlePlayerDeath(damaged, killed, damager, killer);
+						SlimeSlap.HandlePlayerDeath(damaged.getUniqueId(), killed, damager.getUniqueId(), killer);
 						
 						e.setCancelled(true);
 					}
